@@ -1,9 +1,9 @@
-nav i{
+nav.main-navbar i{
     color: orange;
     font-size: 25px;
     margin-right: 20px;
   }
-nav {
+nav.main-navbar {
     margin-bottom:25px;
   z-index: 9999999999999;
   border-bottom: 1px solid #ccc;

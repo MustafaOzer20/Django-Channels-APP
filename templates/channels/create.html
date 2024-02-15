@@ -1,0 +1,29 @@
+{% extends 'layouts.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Channels APP | Create Channel</title>
+{% endblock title %}
+    
+
+
+{% block body %}
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="log-container">
+            <div class="col-md-6 offset-md-3">
+            <img src="#" alt=""></div>
+
+            <form method="POST">
+                {% csrf_token %}
+                {{form | crispy}}
+                <button type="submit" class="btn btn-warning">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock body %}

@@ -1,7 +1,7 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/navbar.css' %}">
 
-<nav>
+<nav class="main-navbar">
   <div class="logo">
     <a href="#home"><img src="#" width="60" height="60"></a>
   </div>
@@ -18,9 +18,9 @@
     <div class="dropdown">
         <button onclick="myFunction()" class="dropbtn">{{request.user.username}}<i onclick="myFuction()" class="fas fa-caret-down"></i></button>
         <div id="myDropdown" class="dropdown-content">
-           <a href="#profile"><i class="fas fa-user"></i>Profile</a>
-           <a href="#channels"><i class="far fa-smile"></i>Channels</a>
-            <a href="#account"><i class="fas fa-user"></i>Account</a>
+           <a href="{% url "users:profile" %}"><i class="fas fa-user"></i>Profile</a>
+           <a href="{% url 'channels:my_channels' %}"><i class="far fa-smile"></i>Channels</a>
+            <a href="{% url "users:profile" %}"><i class="fas fa-user"></i>Account</a>
             {% if request.user.is_superuser %}
                 <a href="#admin"><i class="fas fa-user-shield"></i>Admin</a>
             {% endif %}
