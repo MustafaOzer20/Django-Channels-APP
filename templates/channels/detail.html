@@ -1,0 +1,79 @@
+{% extends 'layouts.html' %}
+{% load static %}
+
+{% block title %}
+    <title>{{ channel.title }} | Channels APP</title>
+    <style>
+        .messages {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 20px;
+            margin-bottom: 30px;
+            overflow-y: auto;
+            height: 50vh;
+        }
+    </style>
+{% endblock title %}
+    
+
+
+{% block body %}
+{% load crispy_forms_tags %}
+{% load static %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- Kullanıcılar -->
+        <div class="col-md-3">
+            <h3>Members</h3>
+            <ul class="list-group">
+                {% for user in channel.users.all %}
+                <li class="list-group-item">{{ user.username }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <!-- Mesajlar -->
+        <div class="col-md-6">
+            <h3>Messages</h3>
+            <div class="messages p-2">
+                {% for message in channel.channelmessages_set.all %}
+                <div class="message">
+                    <div class="card p-2 m-2">
+                        <span>
+                            <strong>
+                                {% if message.user == request.user %}
+                                <span style="color:#007bff;">{{ message.user.username }}:</span>
+                                {% else %}
+                                {{ message.user.username }}:
+                                {% endif %}
+                            </strong> {{ message.message }} <br>
+                            <span class="text-muted small">{{ message.created_at }}</span>
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <form id="messagesForm" method="post">
+                {% csrf_token %}
+                {{ form | crispy}}
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </form>            
+        </div>
+        <!-- İşlemler -->
+        <div class="col-md-3">
+            <h3>Actions</h3>
+            <button class="btn btn-primary mb-2"><i class="fas fa-pencil-alt"></i> Düzenle</button>
+            <button class="btn btn-danger"><i class="fas fa-trash-alt"></i> Sil</button>
+        </div>
+    </div>
+</div>
+<script>
+
+    function scrollToBottom() {
+        var messagesDiv = document.querySelector('.messages');
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    }
+    window.onload = function() {
+        scrollToBottom();
+    };
+</script>
+{% endblock body %}

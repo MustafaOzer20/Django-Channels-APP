@@ -27,7 +27,7 @@
                 {% for membership in memberships %}
                 <tr>
                 <th>#</th>
-                <td>{{ membership.channel.title }}</td>
+                <td><a href="{% url 'channels:channel_detail' pk=membership.channel.id %}">{{ membership.channel.title }}</a></td>
                 <td>
                     {% if membership.channel.is_private %}
                         <i class="fas fa-globe" alt="public"></i>

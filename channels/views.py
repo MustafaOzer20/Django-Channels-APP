@@ -1,9 +1,10 @@
-from django.views.generic import CreateView, ListView
+from django.shortcuts import redirect
+from django.views.generic import CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from channels.models import Channels, ChannelsMembership
-from channels.forms import CreateChannelForm
+from channels.forms import CreateChannelForm, MessageForm
 # Create your views here.
 
 
@@ -48,3 +49,23 @@ class MyChannelsListView(ListView):
         
         context['memberships'] = memberships
         return context
+    
+class ChannelDetailView(DetailView):
+    model = Channels
+    template_name = 'channels/detail.html'
+    context_object_name = 'channel'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = MessageForm()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        form = MessageForm(request.POST)
+        if form.is_valid():
+            # Get the message from the form
+            message = form.save(commit=False)
+            message.user = request.user
+            message.channel = self.get_object()
+            message.save()
+        return redirect(request.path_info) 
