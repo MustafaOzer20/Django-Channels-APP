@@ -1,0 +1,82 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/navbar.css' %}">
+
+<nav>
+  <div class="logo">
+    <a href="#home"><img src="#" width="60" height="60"></a>
+  </div>
+  <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#channels">Channels</a></li>
+  </ul>
+  <div class="burger">
+      <div class="line1"></div>
+      <div class="line2"></div>
+      <div class="line3"></div>
+  </div>
+  {% if request.user.is_authenticated %}
+    <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn">{{request.user.username}}<i onclick="myFuction()" class="fas fa-caret-down"></i></button>
+        <div id="myDropdown" class="dropdown-content">
+           <a href="#profile"><i class="fas fa-user"></i>Profile</a>
+           <a href="#channels"><i class="far fa-smile"></i>Channels</a>
+            <a href="#account"><i class="fas fa-user"></i>Account</a>
+            {% if request.user.is_superuser %}
+                <a href="#admin"><i class="fas fa-user-shield"></i>Admin</a>
+            {% endif %}
+            <a href="{}% url 'user:logout' %{}"><i class="fas fa-sign-out-alt"></i>Çıkış Yap</a>
+        </div>
+    </div>
+    {% else %}
+      <a class="nav-login" href="#login">Login</a>
+      <a class="nav-register" href="{% url 'users:register' %}">Register</a>
+    {% endif %}
+</nav>
+<script>
+    /* When the user clicks on the button, 
+    toggle between hiding and showing the dropdown content */
+    function myFunction() {
+      document.getElementById("myDropdown").classList.toggle("show");
+    }
+    
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+      if (!event.target.matches('.dropbtn')) {
+        var dropdowns = document.getElementsByClassName("dropdown-content");
+        var i;
+        for (i = 0; i < dropdowns.length; i++) {
+          var openDropdown = dropdowns[i];
+          if (openDropdown.classList.contains('show')) {
+            openDropdown.classList.remove('show');
+          }
+        }
+      }
+    }
+    </script>
+
+<script>
+ function navSlide() {
+    const burger = document.querySelector(".burger");
+    const nav = document.querySelector(".nav-links");
+    const navLinks = document.querySelectorAll(".nav-links li");
+    
+    burger.addEventListener("click", () => {
+        //Toggle Nav
+        nav.classList.toggle("nav-active");
+        
+        //Animate Links
+        navLinks.forEach((link, index) => {
+            if (link.style.animation) {
+                link.style.animation = ""
+            } else {
+                link.style.animation = `navLinkFade 0.5s ease forwards ${index / 7 + 0.5}s`;
+            }
+        });
+        //Burger Animation
+        burger.classList.toggle("toggle");
+    });
+    
+}
+
+navSlide();
+</script>
