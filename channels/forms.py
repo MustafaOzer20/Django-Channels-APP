@@ -1,5 +1,5 @@
 from django import forms
-from rooms.models import Channels, ChannelMessages
+from channels.models import Channels, ChannelMessages
 
 class CreateChannelForm(forms.ModelForm):
     class Meta:

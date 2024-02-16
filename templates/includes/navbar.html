@@ -7,7 +7,7 @@
   </div>
   <ul class="nav-links">
       <li><a href="#home">Home</a></li>
-      <li><a href="#rooms">Rooms</a></li>
+      <li><a href="#channels">Channels</a></li>
   </ul>
   <div class="burger">
       <div class="line1"></div>
@@ -19,7 +19,7 @@
         <button onclick="myFunction()" class="dropbtn">{{request.user.username}}<i onclick="myFuction()" class="fas fa-caret-down"></i></button>
         <div id="myDropdown" class="dropdown-content">
            <a href="{% url "users:profile" %}"><i class="fas fa-user"></i>Profile</a>
-           <a href="{% url 'rooms:my_rooms' %}"><i class="far fa-smile"></i>Rooms</a>
+           <a href="{% url 'channels:my_channels' %}"><i class="far fa-smile"></i>Channels</a>
             <a href="{% url "users:profile" %}"><i class="fas fa-user"></i>Account</a>
             {% if request.user.is_superuser %}
                 <a href="#admin"><i class="fas fa-user-shield"></i>Admin</a>

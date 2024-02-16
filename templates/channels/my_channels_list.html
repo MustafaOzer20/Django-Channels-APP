@@ -1,0 +1,77 @@
+{% extends 'layouts.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Channels APP | Create Channel</title>
+{% endblock title %}
+    
+
+
+{% block body %}
+{% load static %}
+<a href="{% url 'channels:create' %}">Create Channel</a>
+<div class="card mt-3 mb-3 p-4">
+    <h1>My Channels List</h1>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Member Type</th>
+                    <th scope="col">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for membership in memberships %}
+                <tr>
+                <th>#</th>
+                <td><a href="{% url 'channels:channel_detail' pk=membership.channel.id %}">{{ membership.channel.title }}</a></td>
+                <td>
+                    {% if membership.channel.is_private %}
+                        <i class="fas fa-globe" alt="public"></i>
+                    {% else %}
+                        <i class="fas fa-lock" alt="private"></i>
+                    {% endif %}
+                </td>
+                {% if membership.channel.admin_user == request.user %}
+                    <td>admin</td>
+                    <td>
+                        <a href="#invite"><i class="fas fa-user-plus"></i></a>&nbsp;&nbsp;
+                        <a href="#joinrequests"><i class="fas fa-user-friends"></i></i></a>&nbsp;&nbsp;
+                        <a href="#edit"><i class="fas fa-pencil-alt"></i></a>&nbsp;&nbsp;
+                        <a href="#delete"><i class="fas fa-trash-alt"></i></a>
+                    </td>
+                {% else %}
+                    <td>member</td>
+                    <td>
+                        <i class="fas fa-user-plus"></i>
+                        <i class="fas fa-pencil-alt"></i>
+                        <i class="fas fa-trash-alt"></i>
+                    </td>
+                {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+
+      {% if is_paginated %}
+
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+
+      {% endif %}   
+{% endblock body %}
