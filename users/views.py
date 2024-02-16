@@ -5,16 +5,29 @@ from django.contrib.auth.views import LoginView
 
 from django.contrib.auth.views import LogoutView
 from django.http import HttpResponseRedirect
-from django.urls import reverse
+from django.urls import reverse_lazy
 
 from django.contrib.auth.models import User
 from users.forms import RegisterForm
+
+from django.contrib.auth.decorators import user_passes_test
+from django.utils.decorators import method_decorator
 # Create your views here.
+
+def user_not_authenticated(request):
+    if request.user.is_authenticated:
+        return True
+    return False
 
 
 class RegisterView(CreateView):
     form_class = RegisterForm
     template_name = 'users/register.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if user_not_authenticated(request):
+            return redirect("/")
+        return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
         email = form.cleaned_data.get('email')
@@ -28,8 +41,14 @@ class RegisterView(CreateView):
         user.save()
         return redirect("/users/login/")
     
+
 class CustomLoginView(LoginView):
     template_name = 'users/login.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if user_not_authenticated(request):
+            return redirect("/")
+        return super().dispatch(request, *args, **kwargs)
 
 
 class ProfileView(LoginRequiredMixin, DetailView):
@@ -41,5 +60,4 @@ class ProfileView(LoginRequiredMixin, DetailView):
         return self.request.user
     
 class CustomLogoutView(LogoutView):
-    def dispatch(self, request, *args, **kwargs):
-        return HttpResponseRedirect(reverse('users:login'))
+    next_page = reverse_lazy('users:login')

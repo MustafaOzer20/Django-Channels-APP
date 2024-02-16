@@ -7,7 +7,7 @@
   </div>
   <ul class="nav-links">
       <li><a href="#home">Home</a></li>
-      <li><a href="#channels">Channels</a></li>
+      <li><a href="{% url "channels:all_channels" %}">Channels</a></li>
   </ul>
   <div class="burger">
       <div class="line1"></div>
@@ -24,11 +24,14 @@
             {% if request.user.is_superuser %}
                 <a href="#admin"><i class="fas fa-user-shield"></i>Admin</a>
             {% endif %}
-            <a href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt"></i>Logout</a>
+            <form action="{% url 'users:logout' %}" method="post">
+              {% csrf_token %}
+              <button type="submit" class="btn"><i class="fas fa-sign-out-alt"></i>Logout</button>
+          </form>
         </div>
     </div>
     {% else %}
-      <a class="nav-login" href="#login">Login</a>
+      <a class="nav-login" href="{% url 'users:login' %}">Login</a>
       <a class="nav-register" href="{% url 'users:register' %}">Register</a>
     {% endif %}
 </nav>
