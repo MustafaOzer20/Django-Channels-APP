@@ -3,16 +3,16 @@ from django.views.generic import CreateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from channels.models import Channels, ChannelsMembership
-from channels.forms import CreateChannelForm, MessageForm
+from rooms.models import Channels, ChannelsMembership
+from rooms.forms import CreateChannelForm, MessageForm
 # Create your views here.
 
 
 class CreateChannelView(LoginRequiredMixin, CreateView):
     model = Channels
     form_class = CreateChannelForm
-    template_name = 'channels/create.html'
-    success_url = '/channels/my-channels-list'
+    template_name = 'rooms/create.html'
+    success_url = '/rooms/my-rooms-list'
 
     def form_valid(self, form):
         channel = form.save(commit=False)
@@ -36,7 +36,7 @@ def get_memberships(paginator, page):
 
 class MyChannelsListView(ListView):
     model = ChannelsMembership
-    template_name = 'channels/my_channels_list.html'
+    template_name = 'rooms/my_rooms_list.html'
     context_object_name = 'memberships'
     paginate_by = 10
 
@@ -52,7 +52,7 @@ class MyChannelsListView(ListView):
     
 class ChannelDetailView(DetailView):
     model = Channels
-    template_name = 'channels/detail.html'
+    template_name = 'rooms/detail.html'
     context_object_name = 'channel'
 
     def get_context_data(self, **kwargs):
