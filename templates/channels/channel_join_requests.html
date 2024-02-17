@@ -1,0 +1,74 @@
+{% extends 'layouts.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Channel Join Requests</title>
+    <style>
+        .btn:hover {
+            cursor: pointer;
+        }
+    </style>
+{% endblock title %}
+    
+
+
+{% block body %}
+{% load static %}
+<a href="{% url 'channels:channel_detail' channel_id %}" class="btn btn-primary"><-Return Channel</a>
+<div class="card mt-3 mb-3 p-4">
+    
+    <h1>Join Requests</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Username</th>
+                <th scope="col">Request Date</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for j_request in all_requests %}
+                <tr>
+                <th>#</th>
+                <td>{{ j_request.user.username }}</td>
+                <td>{{ j_request.created_at }}</td>
+                <td>
+                    <div style="display: inline-block;">
+                        <form method="post" action="{% url 'channels:join_request_decision' j_request.id 'approve' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i></button>
+                        </form>  
+                    </div>
+                    <div style="display: inline-block;">
+                        <form method="post" action="{% url 'channels:join_request_decision' j_request.id 'reject' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger"><i class="fas fa-times-circle"></i></button>
+                        </form> 
+                    </div>
+                </td>
+                
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% if is_paginated %}
+
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+
+      {% endif %}   
+
+{% endblock body %}

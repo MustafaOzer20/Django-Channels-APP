@@ -26,7 +26,7 @@ class RegisterView(CreateView):
 
     def dispatch(self, request, *args, **kwargs):
         if user_not_authenticated(request):
-            return redirect("/")
+            return redirect(reverse_lazy('channels:home'))
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -39,7 +39,7 @@ class RegisterView(CreateView):
         user = User(username=username, first_name=first_name, last_name=last_name, email=email)
         user.set_password(password)
         user.save()
-        return redirect("/users/login/")
+        return redirect(reverse_lazy('users:login'))
     
 
 class CustomLoginView(LoginView):
@@ -47,7 +47,7 @@ class CustomLoginView(LoginView):
 
     def dispatch(self, request, *args, **kwargs):
         if user_not_authenticated(request):
-            return redirect("/")
+            return redirect(reverse_lazy('channels:home'))
         return super().dispatch(request, *args, **kwargs)
 
 

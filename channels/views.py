@@ -1,11 +1,19 @@
+from typing import Any
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, ListView, DetailView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.db.models import F
+from django.core.paginator import Paginator
+from django.views.generic import View
+from django.shortcuts import get_object_or_404
 
-from channels.models import Channels, ChannelsMembership
+from django.contrib import messages
+
+from channels.helpers import get_channels, is_exists
+from channels.models import ChannelJoinRequest, Channels, ChannelsMembership
 from channels.forms import CreateChannelForm, MessageForm
+from django.db.models import Count
 # Create your views here.
 
 class WelcomeView(TemplateView):
@@ -27,15 +35,6 @@ class CreateChannelView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-def get_channels(paginator, page):
-    try:
-        channels = paginator.page(page)
-    except PageNotAnInteger:
-        channels = paginator.page(1)
-    except EmptyPage:
-        channels = paginator.page(paginator.num_pages)
-    return channels
-
 
 class MyChannelsListView(ListView):
     model = ChannelsMembership
@@ -44,7 +43,7 @@ class MyChannelsListView(ListView):
     paginate_by = 2
 
     def get_queryset(self):
-        return ChannelsMembership.objects.order_by('-joined_at')
+        return ChannelsMembership.objects.filter(user=self.request.user).order_by('-joined_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -62,11 +61,20 @@ class ChannelDetailView(DetailView):
     context_object_name = 'channel'
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['form'] = MessageForm()
-        return context
+        channel = self.get_object()
+        if self.request.user in channel.users.all():
+            context = super().get_context_data(**kwargs)
+            context['form'] = MessageForm()
+            return context
+        return None
 
-    def post(self, request, *args, **kwargs):
+    def get(self, request: HttpRequest, *args: Any, **kwargs: Any) -> HttpResponse:
+        channel = self.get_object()
+        if self.request.user in channel.users.all():
+            return super().get(request, *args, **kwargs)
+        return redirect(reverse_lazy('channels:all_channels'))
+    
+    def post(self, request, *args, **kwargs):   
         form = MessageForm(request.POST)
         if form.is_valid():
             # Get the message from the form
@@ -75,6 +83,7 @@ class ChannelDetailView(DetailView):
             message.channel = self.get_object()
             message.save()
         return redirect(request.path_info) 
+        
     
 
 class ChannelsListView(ListView):
@@ -84,7 +93,7 @@ class ChannelsListView(ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Channels.objects.order_by('-created_at')
+        return Channels.objects.annotate(num_users=Count('users')).order_by('-created_at')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -95,3 +104,71 @@ class ChannelsListView(ListView):
         
         context['all_channels'] = all_channels
         return context
+    
+
+class JoinChannelRequestView(View):
+    def post(self, request, channel_id):
+        try:
+            channel = Channels.objects.get(id=channel_id)
+        except Channels.DoesNotExist:
+            messages.error(request, "Channel does'nt exist.")
+            return redirect(reverse_lazy('channels:all_channels'))
+
+        if not is_exists(model=ChannelsMembership, user=request.user, channel=channel):
+            if not is_exists(model=ChannelJoinRequest, user=request.user, channel=channel):
+                if channel.is_private:
+                    ChannelJoinRequest.objects.create(user=request.user, channel=channel)
+                    messages.success(request, "Your join request has been sent to the channel.")  
+                    return redirect(reverse_lazy('channels:all_channels'))  
+                else:
+                    ChannelsMembership.objects.create(user=request.user, channel=channel)
+                    messages.success(request, "You have successfully joined the channel.")
+            else:
+                messages.warning(request, "You have already sent a join request.")
+                return redirect(reverse_lazy('channels:all_channels'))
+        else:
+            messages.warning(request, "You are already a member of this channel.")
+
+
+        return redirect(reverse_lazy('channels:detail', kwargs={'channel_id': channel.id}))
+
+
+class ChannelJoinRequestListView(ListView):
+    model = ChannelJoinRequest
+    template_name = 'channels/channel_join_requests.html'
+    context_object_name = 'all_requests'
+    paginate_by = 10
+
+    def get_queryset(self):
+        channel_id = self.kwargs['channel_id']
+        return ChannelJoinRequest.objects.filter(
+            channel_id=channel_id, 
+            channel__admin_user=self.request.user
+        ).order_by('-created_at')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        all_requests = context['all_requests']
+        paginator = Paginator(all_requests, self.paginate_by)
+        page = self.request.GET.get('page')
+        all_requests = get_channels(paginator, page)
+        channel_id = self.kwargs['channel_id']
+        context['all_requests'] = all_requests
+        context['channel_id'] = channel_id
+        return context
+    
+class JoinRequestDecisionView(View):
+    def post(self, request, request_id, decision):
+        join_request = get_object_or_404(ChannelJoinRequest, id=request_id)
+        channel_id = join_request.channel.id
+        if join_request.channel.admin_user == request.user:
+            if decision == 'approve':
+                ChannelsMembership.objects.create(
+                    user=join_request.user, 
+                    channel=join_request.channel
+                )
+                join_request.delete()
+            elif decision == 'reject':
+                join_request.delete()
+
+        return redirect(reverse_lazy('channels:list_join_requests', kwargs={'channel_id': channel_id}))

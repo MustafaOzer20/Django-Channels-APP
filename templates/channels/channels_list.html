@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block title %}
-    <title>Channels APP | Create Channel</title>
+    <title>Channels APP | Channels</title>
 {% endblock title %}
     
 
@@ -18,6 +18,7 @@
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
+                    <th scope="col">Members</th>
                     <th scope="col">Status</th>
                     <th scope="col">Actions</th>
                 </tr>
@@ -27,19 +28,26 @@
                 <tr>
                 <th>#</th>
                 <td><a href="{% url 'channels:channel_detail' pk=channel.id %}">{{ channel.title }}</a></td>
+                <td>{{ channel.num_users }}</td>
                 <td>
                     {% if channel.is_private %}
-                        <i class="fas fa-globe" alt="public"></i>
-                    {% else %}
                         <i class="fas fa-lock" alt="private"></i>
+                    {% else %}
+                        <i class="fas fa-globe" alt="public"></i>  
                     {% endif %}
                 </td>
                 {% if channel.admin_user == request.user %}
                     <td>admin</td>
-                {% elif channel.users == request.user %}
+                {% elif request.user in channel.users.all %}
                     <td>member</td>
                 {% else %}
-                    <td><a href="#joinrequests"><i class="fas fa-user-friends"></i></i></a></td>
+                    <td>
+                        <form method="post" action="{% url 'channels:join_request' channel.id %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="channel_id" value="{{ channel.id }}">
+                            <button type="submit" class="btn btn-primary"><i class="fas fa-user-friends"></i></button>
+                        </form>                        
+                    </td>
                 {% endif %}
                 </tr>
                 {% endfor %}
