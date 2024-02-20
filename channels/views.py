@@ -75,7 +75,14 @@ class EditChannelView(LoginRequiredMixin, UpdateView):
 
 class DeleteChannelView(LoginRequiredMixin, View):
     def post(self, request):
-        pass
+        channel_id = request.POST.get('channel_id')
+        channel = get_object_or_404(Channels, id=channel_id)
+        if request.user == channel.admin_user:
+            channel.delete()
+            messages.success(request, "Channel deleted successfully.")
+        else:
+            messages.error(request, "You are not authorized to delete this channel.")
+        return redirect('channels:my_channels')
 
 class MyChannelsListView(LoginRequiredMixin, ListView):
     model = ChannelsMembership
@@ -172,7 +179,7 @@ class JoinChannelRequestView(LoginRequiredMixin, View):
             messages.warning(request, "You are already a member of this channel.")
 
 
-        return redirect(reverse_lazy('channels:detail', kwargs={'channel_id': channel.id}))
+        return redirect(reverse_lazy('channels:channel_detail', kwargs={'channel_id': channel.id}))
 
 
 class ChannelJoinRequestListView(LoginRequiredMixin, ListView):
