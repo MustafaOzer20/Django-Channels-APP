@@ -36,7 +36,7 @@ class CreateChannelView(LoginRequiredMixin, CreateView):
 
 
 
-class MyChannelsListView(ListView):
+class MyChannelsListView(LoginRequiredMixin, ListView):
     model = ChannelsMembership
     template_name = 'channels/my_channels_list.html'
     context_object_name = 'memberships'
@@ -55,7 +55,7 @@ class MyChannelsListView(ListView):
         context['memberships'] = memberships
         return context
     
-class ChannelDetailView(DetailView):
+class ChannelDetailView(LoginRequiredMixin, DetailView):
     model = Channels
     template_name = 'channels/detail.html'
     context_object_name = 'channel'
@@ -106,7 +106,7 @@ class ChannelsListView(ListView):
         return context
     
 
-class JoinChannelRequestView(View):
+class JoinChannelRequestView(LoginRequiredMixin, View):
     def post(self, request, channel_id):
         try:
             channel = Channels.objects.get(id=channel_id)
@@ -133,7 +133,7 @@ class JoinChannelRequestView(View):
         return redirect(reverse_lazy('channels:detail', kwargs={'channel_id': channel.id}))
 
 
-class ChannelJoinRequestListView(ListView):
+class ChannelJoinRequestListView(LoginRequiredMixin, ListView):
     model = ChannelJoinRequest
     template_name = 'channels/channel_join_requests.html'
     context_object_name = 'all_requests'
@@ -157,7 +157,7 @@ class ChannelJoinRequestListView(ListView):
         context['channel_id'] = channel_id
         return context
     
-class JoinRequestDecisionView(View):
+class JoinRequestDecisionView(LoginRequiredMixin, View):
     def post(self, request, request_id, decision):
         join_request = get_object_or_404(ChannelJoinRequest, id=request_id)
         channel_id = join_request.channel.id
