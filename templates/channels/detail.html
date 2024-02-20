@@ -69,11 +69,11 @@
                 {% endif %}
                 <!--<div class="mb-2">
                     <a class="btn btn-success" href="{}% url 'channels:manage_members' channel.id %{}">Manage Members</a>
-                </div>
+                </div>-->
                 <div class="mb-2">
-                    <a class="btn btn-primary" href="{}% url 'channels:edit' channel.id %{}">Edit</a>
+                    <a class="btn btn-primary" href="{% url 'channels:edit' channel.id %}">Edit</a>
                 </div>
-                <div class="mb-2">
+                <!--<div class="mb-2">
                     <a class="btn btn-danger" href="{}% url 'channels:delete' channel.id %{}">Delete</a>
                 </div>-->               
             {% endif %}

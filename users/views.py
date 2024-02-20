@@ -1,17 +1,13 @@
-from django.shortcuts import render, redirect, HttpResponse
+from django.shortcuts import redirect
 from django.views.generic import CreateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.views import LoginView
-
 from django.contrib.auth.views import LogoutView
-from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-
 from django.contrib.auth.models import User
+
 from users.forms import RegisterForm
 
-from django.contrib.auth.decorators import user_passes_test
-from django.utils.decorators import method_decorator
 # Create your views here.
 
 def user_not_authenticated(request):

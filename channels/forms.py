@@ -6,6 +6,11 @@ class CreateChannelForm(forms.ModelForm):
         model = Channels
         fields = ['title', 'is_private']
 
+class EditChannelForm(forms.ModelForm):
+    class Meta:
+        model = Channels
+        fields = ['title', 'is_private']
+
 
 class MessageForm(forms.ModelForm):
     class Meta:

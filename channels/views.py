@@ -1,21 +1,27 @@
 from typing import Any
-from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect
-from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, ListView, DetailView, TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.core.paginator import Paginator
-from django.views.generic import View
-from django.shortcuts import get_object_or_404
 
 from django.contrib import messages
-
-from channels.helpers import get_channels, is_exists
-from channels.models import ChannelJoinRequest, Channels, ChannelsMembership
-from channels.forms import CreateChannelForm, MessageForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.paginator import Paginator
 from django.db.models import Count
+from django.http import HttpRequest, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
+from django.views.generic import (
+    CreateView, 
+    ListView, 
+    DetailView, 
+    TemplateView, 
+    UpdateView,
+    View
+)
 
 import random
+
+from channels.helpers import get_channels, is_exists
+from channels.forms import CreateChannelForm, EditChannelForm, MessageForm
+from channels.models import ChannelJoinRequest, Channels, ChannelsMembership
+
 # Create your views here.
 
 class WelcomeView(TemplateView):
@@ -35,6 +41,38 @@ class CreateChannelView(LoginRequiredMixin, CreateView):
         ChannelsMembership.objects.create(user=self.request.user, channel=channel)
 
         return super().form_valid(form)
+
+
+class EditChannelView(LoginRequiredMixin, UpdateView):
+    model = Channels
+    form_class = EditChannelForm 
+    template_name = 'channels/edit.html'
+    success_url = '/channels/my-channels-list'
+
+    def form_valid(self, form):
+        channel = form.save(commit=False)
+        if channel.is_private is False:
+            join_requests = ChannelJoinRequest.objects.filter(channel=channel)
+            for join_request in join_requests:
+                ChannelsMembership.objects.create(user=join_request.user, channel=channel)
+                join_request.delete()
+            messages.success(self.request, "Channel updated successfully. Join requests are processed.")
+        else:
+            messages.success(self.request, "Channel updated successfully.")
+        channel.save()
+        return super().form_valid(form)
+
+
+    def get_object(self, queryset=None):
+        return get_object_or_404(Channels, id=self.kwargs['channel_id'])
+    
+    def get_initial(self):
+        channel = self.get_object()
+        return {'title': channel.title, 'is_private': channel.is_private}
+    
+    def get_success_url(self):
+        return reverse_lazy('channels:channel_detail', kwargs={'pk': self.kwargs['channel_id']})
+
 
 
 

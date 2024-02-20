@@ -1,6 +1,5 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from channels.models import ChannelJoinRequest, ChannelsMembership
 
 def get_channels(paginator:Paginator, page):
     try:
