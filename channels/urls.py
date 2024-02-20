@@ -5,6 +5,7 @@ from channels.views import ChannelDetailView
 from channels.views import MyChannelsListView
 from channels.views import ChannelsListView
 from channels.views import JoinChannelRequestView, ChannelJoinRequestListView, JoinRequestDecisionView
+from channels.views import LeaveChannelView
 
 
 app_name = "channels"
@@ -19,5 +20,7 @@ urlpatterns = [
     path('channels/join-request/submit', JoinChannelRequestView.as_view(), name="join_request"),
     path('channels/detail/<int:channel_id>/requests', ChannelJoinRequestListView.as_view(), name="list_join_requests"),
     path('channels/join-request/decision', JoinRequestDecisionView.as_view(), name='join_request_decision'),
+
+    path('channels/leave', LeaveChannelView.as_view(), name='leave'),
 
 ]

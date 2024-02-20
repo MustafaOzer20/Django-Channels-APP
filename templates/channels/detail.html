@@ -61,7 +61,27 @@
         <!-- İşlemler -->
         <div class="col-md-3">
             <h3>Actions</h3>
-            <a href="{% url "channels:list_join_requests" channel.id %}">Join Requests</a>
+            {% if request.user == channel.admin_user %}
+                {% if channel.is_private %}
+                    <div class="mb-2">
+                        <a class="btn btn-info" href="{% url 'channels:list_join_requests' channel.id %}">Join Requests</a>
+                    </div>
+                {% endif %}
+                <!--<div class="mb-2">
+                    <a class="btn btn-success" href="{}% url 'channels:manage_members' channel.id %{}">Manage Members</a>
+                </div>
+                <div class="mb-2">
+                    <a class="btn btn-primary" href="{}% url 'channels:edit' channel.id %{}">Edit</a>
+                </div>
+                <div class="mb-2">
+                    <a class="btn btn-danger" href="{}% url 'channels:delete' channel.id %{}">Delete</a>
+                </div>-->               
+            {% endif %}
+            <form method="post" action="{% url "channels:leave" %}">
+                {% csrf_token %}
+                <input type="hidden" name="channel_id" value="{{ channel.id }}">
+                <button type="submit" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i>&nbsp;Leave Channel</button>
+            </form>  
         </div>
     </div>
 </div>

@@ -14,6 +14,8 @@ from channels.helpers import get_channels, is_exists
 from channels.models import ChannelJoinRequest, Channels, ChannelsMembership
 from channels.forms import CreateChannelForm, MessageForm
 from django.db.models import Count
+
+import random
 # Create your views here.
 
 class WelcomeView(TemplateView):
@@ -176,3 +178,24 @@ class JoinRequestDecisionView(LoginRequiredMixin, View):
                 join_request.delete()
 
         return redirect(reverse_lazy('channels:list_join_requests', kwargs={'channel_id': channel_id}))
+    
+
+class LeaveChannelView(LoginRequiredMixin, View):
+    def post(self, request):
+        channel_id = request.POST.get('channel_id')
+        channel = get_object_or_404(Channels, id=channel_id)
+        if is_exists(model=ChannelsMembership, user=request.user, channel=channel):
+            if channel.admin_user == request.user:
+                if channel.users.count() == 1:
+                    channel.delete()
+                    messages.success(request, "You have left the channel successfully.")
+                    return redirect(reverse_lazy('channels:all_channels'))
+                random_member = random.choice(channel.users.exclude(id=request.user.id))
+                channel.admin_user = random_member
+                channel.save()
+            membership = ChannelsMembership.objects.get(channel=channel, user=request.user)
+            membership.delete()
+            messages.success(request, "You have left the channel successfully.")
+        else:
+            messages.error(request, "You are not already a member of this channel.")
+        return redirect(reverse_lazy('channels:all_channels'))
