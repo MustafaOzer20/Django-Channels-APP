@@ -67,9 +67,6 @@
                         <a class="btn btn-info" href="{% url 'channels:list_join_requests' channel.id %}">Join Requests</a>
                     </div>
                 {% endif %}
-                <!--<div class="mb-2">
-                    <a class="btn btn-success" href="{}% url 'channels:manage_members' channel.id %{}">Manage Members</a>
-                </div>-->
                 <div class="mb-2">
                     <a class="btn btn-primary" href="{% url 'channels:edit' channel.id %}">Edit</a>
                 </div>
@@ -81,6 +78,9 @@
                     </form> 
                 </div>              
             {% endif %}
+            <div class="mb-2">
+                <a class="btn btn-success" href="{% url 'channels:members' channel.id %}">Members</a>
+            </div>
             <form method="post" action="{% url "channels:leave" %}">
                 {% csrf_token %}
                 <input type="hidden" name="channel_id" value="{{ channel.id }}">

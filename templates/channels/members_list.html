@@ -1,0 +1,83 @@
+{% extends 'layouts.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Channels APP | Channel Members</title>
+{% endblock title %}
+    
+
+
+{% block body %}
+{% load static %}
+
+{% load crispy_forms_tags %}
+<div class="mb-3">
+    <a href="{% url 'channels:channel_detail' channel.id %}" class="btn btn-primary"><-Return Channel</a>
+</div>
+<form method="GET" action="{% url 'channels:members' channel.id %}">
+    <input type="text" name="q" placeholder="Search by username">
+    <button type="submit">Search</button>
+</form>
+<div class="card mt-3 mb-3 p-4">
+    <h1>Channel Members</h1>
+
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Username</th>
+                    <th scope="col">Joined At</th>
+                    {% if request.user == channel.admin_user %}
+                    <th scope="col">Make Admin</th>
+                    <th scope="col">Remove</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr>
+                <th>#</th>
+                <td>{{ member.user.username }}</td>
+                <td>{{ member.joined_at }}</td>
+                {% if request.user == channel.admin_user %}
+                    {% if request.user != member.user %}
+                        <td>
+                            <form class="mr-2 mb-2" method="post" action="#">
+                                {% csrf_token %}
+                                <input type="hidden" name="channel_id" value="{{ channel.id }}">
+                                <button type="submit" class="btn btn-warning"><i class="fas fa-exchange-alt"></i></button>
+                            </form> 
+                        </td>
+                        <td>
+                            <form class="mr-2 mb-2" method="post" action="#">
+                                {% csrf_token %}
+                                <input type="hidden" name="channel_id" value="{{ channel.id }}">
+                                <button type="submit" class="btn btn-danger"><i class="fas fa-trash-alt"></i></button>
+                            </form> 
+                        </td>
+                    {% endif %}
+                {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+
+      {% if is_paginated %}
+
+            <ul class="pagination">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                    <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                    </li>
+                {% endfor %}
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+
+      {% endif %}   
+{% endblock body %}

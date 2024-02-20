@@ -1,14 +1,14 @@
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 
-def get_channels(paginator:Paginator, page):
+def get_page_data(paginator:Paginator, page):
     try:
-        channels = paginator.page(page)
+        data = paginator.page(page)
     except PageNotAnInteger:
-        channels = paginator.page(1)
+        data = paginator.page(1)
     except EmptyPage:
-        channels = paginator.page(paginator.num_pages)
-    return channels
+        data = paginator.page(paginator.num_pages)
+    return data
 
 
 def is_exists(model, **kwargs):

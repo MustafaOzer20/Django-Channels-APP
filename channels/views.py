@@ -18,7 +18,7 @@ from django.views.generic import (
 
 import random
 
-from channels.helpers import get_channels, is_exists
+from channels.helpers import get_page_data, is_exists
 from channels.forms import CreateChannelForm, EditChannelForm, MessageForm
 from channels.models import ChannelJoinRequest, Channels, ChannelsMembership
 
@@ -98,7 +98,7 @@ class MyChannelsListView(LoginRequiredMixin, ListView):
         memberships = context['memberships']
         paginator = Paginator(memberships, self.paginate_by)
         page = self.request.GET.get('page')
-        memberships = get_channels(paginator, page)
+        memberships = get_page_data(paginator, page)
         
         context['memberships'] = memberships
         return context
@@ -148,9 +148,41 @@ class ChannelsListView(ListView):
         all_channels = context['all_channels']
         paginator = Paginator(all_channels, self.paginate_by)
         page = self.request.GET.get('page')
-        all_channels = get_channels(paginator, page)
+        all_channels = get_page_data(paginator, page)
         
         context['all_channels'] = all_channels
+        return context
+    
+
+class ChannelMemberListView(LoginRequiredMixin, ListView):
+    template_name = 'channels/members_list.html'
+    context_object_name = 'members'
+    paginate_by = 10
+
+    def get_queryset(self):
+        channel_id = self.kwargs.get('channel_id')
+        query = self.request.GET.get('q')
+        if query:
+            return ChannelsMembership.objects.filter(
+                channel_id=channel_id, user__username__icontains=query
+            ).select_related('user').order_by('-joined_at')
+        else: 
+            return ChannelsMembership.objects.filter(
+                channel_id=channel_id
+                ).select_related('user').order_by('-joined_at')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        channel_id = self.kwargs.get('channel_id')
+        channel = get_object_or_404(Channels, pk=channel_id)
+        
+        members = context['members']
+        paginator = Paginator(members, self.paginate_by)
+        page = self.request.GET.get('page')
+        members = get_page_data(paginator, page)
+
+        context['members'] = members
+        context['channel'] = channel
         return context
     
 
@@ -200,7 +232,7 @@ class ChannelJoinRequestListView(LoginRequiredMixin, ListView):
         all_requests = context['all_requests']
         paginator = Paginator(all_requests, self.paginate_by)
         page = self.request.GET.get('page')
-        all_requests = get_channels(paginator, page)
+        all_requests = get_page_data(paginator, page)
         channel_id = self.kwargs['channel_id']
         context['all_requests'] = all_requests
         context['channel_id'] = channel_id

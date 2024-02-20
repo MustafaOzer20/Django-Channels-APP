@@ -7,6 +7,7 @@ from channels.views import (
     ChannelDetailView,
     MyChannelsListView,
     ChannelsListView,
+    ChannelMemberListView,
     JoinChannelRequestView,
     ChannelJoinRequestListView,
     JoinRequestDecisionView,
@@ -25,6 +26,8 @@ urlpatterns = [
     path('channels/detail/<int:pk>/', ChannelDetailView.as_view(), name='channel_detail'),
     path('channels/my-channels-list/', MyChannelsListView.as_view(), name="my_channels"),
     path('channels/', ChannelsListView.as_view(), name="all_channels"),
+
+    path('channels/<int:channel_id>/members/', ChannelMemberListView.as_view(), name='members'),
 
     path('channels/join-request/submit', JoinChannelRequestView.as_view(), name="join_request"),
     path('channels/detail/<int:channel_id>/requests', ChannelJoinRequestListView.as_view(), name="list_join_requests"),
