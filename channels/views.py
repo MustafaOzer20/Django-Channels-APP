@@ -73,8 +73,9 @@ class EditChannelView(LoginRequiredMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('channels:channel_detail', kwargs={'pk': self.kwargs['channel_id']})
 
-
-
+class DeleteChannelView(LoginRequiredMixin, View):
+    def post(self, request):
+        pass
 
 class MyChannelsListView(LoginRequiredMixin, ListView):
     model = ChannelsMembership
@@ -200,8 +201,8 @@ class ChannelJoinRequestListView(LoginRequiredMixin, ListView):
     
 class JoinRequestDecisionView(LoginRequiredMixin, View):
     def post(self, request):
-        request_id = channel_id = request.POST.get('j_request_id')
-        decision = channel_id = request.POST.get('decision')
+        request_id = request.POST.get('j_request_id')
+        decision = request.POST.get('decision')
 
         join_request = get_object_or_404(ChannelJoinRequest, id=request_id)
         channel_id = join_request.channel.id
