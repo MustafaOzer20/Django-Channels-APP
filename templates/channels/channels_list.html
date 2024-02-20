@@ -48,7 +48,7 @@
                     <td>member</td>
                 {% else %}
                     <td>
-                        <form method="post" action="{% url 'channels:join_request' channel.id %}">
+                        <form method="post" action="{% url 'channels:join_request' %}">
                             {% csrf_token %}
                             <input type="hidden" name="channel_id" value="{{ channel.id }}">
                             <button type="submit" class="btn btn-primary"><i class="fas fa-user-friends"></i></button>

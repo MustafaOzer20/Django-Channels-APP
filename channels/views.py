@@ -107,7 +107,8 @@ class ChannelsListView(ListView):
     
 
 class JoinChannelRequestView(LoginRequiredMixin, View):
-    def post(self, request, channel_id):
+    def post(self, request):
+        channel_id = request.POST.get('channel_id')
         try:
             channel = Channels.objects.get(id=channel_id)
         except Channels.DoesNotExist:
@@ -158,7 +159,10 @@ class ChannelJoinRequestListView(LoginRequiredMixin, ListView):
         return context
     
 class JoinRequestDecisionView(LoginRequiredMixin, View):
-    def post(self, request, request_id, decision):
+    def post(self, request):
+        request_id = channel_id = request.POST.get('j_request_id')
+        decision = channel_id = request.POST.get('decision')
+
         join_request = get_object_or_404(ChannelJoinRequest, id=request_id)
         channel_id = join_request.channel.id
         if join_request.channel.admin_user == request.user:

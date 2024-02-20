@@ -35,14 +35,18 @@
                 <td>{{ j_request.created_at }}</td>
                 <td>
                     <div style="display: inline-block;">
-                        <form method="post" action="{% url 'channels:join_request_decision' j_request.id 'approve' %}">
+                        <form method="post" action="{% url 'channels:join_request_decision'  %}">
                             {% csrf_token %}
+                            <input type="hidden" name="j_request_id" value="{{ j_request.id }}">
+                            <input type="hidden" name="decision" value="approve">
                             <button type="submit" class="btn btn-success"><i class="fas fa-check-circle"></i></button>
                         </form>  
                     </div>
                     <div style="display: inline-block;">
-                        <form method="post" action="{% url 'channels:join_request_decision' j_request.id 'reject' %}">
+                        <form method="post" action="{% url 'channels:join_request_decision' %}">
                             {% csrf_token %}
+                            <input type="hidden" name="j_request_id" value="{{ j_request.id }}">
+                            <input type="hidden" name="decision" value="reject">
                             <button type="submit" class="btn btn-danger"><i class="fas fa-times-circle"></i></button>
                         </form> 
                     </div>

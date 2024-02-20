@@ -16,8 +16,8 @@ urlpatterns = [
     path('channels/my-channels-list/', MyChannelsListView.as_view(), name="my_channels"),
     path('channels/', ChannelsListView.as_view(), name="all_channels"),
 
-    path('channels/join-request/<int:channel_id>', JoinChannelRequestView.as_view(), name="join_request"),
+    path('channels/join-request/submit', JoinChannelRequestView.as_view(), name="join_request"),
     path('channels/detail/<int:channel_id>/requests', ChannelJoinRequestListView.as_view(), name="list_join_requests"),
-    path('join-request/<int:request_id>/<str:decision>/', JoinRequestDecisionView.as_view(), name='join_request_decision'),
+    path('channels/join-request/decision', JoinRequestDecisionView.as_view(), name='join_request_decision'),
 
 ]
