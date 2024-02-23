@@ -17,7 +17,7 @@ Not: Mesajlar gerçek zamanlı değildir.
 
 - Python/Django: Arka uç geliştirme
 - HTML/CSS/JavaScript: Ön uç geliştirme
-- PostgreSQL: Veritabanı yönetimi
+- SQLite3: Veritabanı yönetimi
 - Bootstrap: Ön uç tasarımı
 
 ## Kurulum
@@ -74,7 +74,7 @@ Note: Messages are not realtime.
 
 - Python/Django: Backend development
 - HTML/CSS/JavaScript: Frontend development
-- PostgreSQL: Database management
+- SQLite3: Database management
 - Bootstrap: Frontend design
 
 ## Installation
